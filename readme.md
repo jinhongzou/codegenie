@@ -2,7 +2,7 @@
 
 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white)
 
-一个基于smolagents智能体框架，使用Streamlit交互式应用构建的智能编程助手，集成自然语言处理与代码生成能力，帮助您通过对话完成数据处理、文件操作和编程任务。
+基于SmolAgents大语言智能体框架构建，并使用Streamlit作为交互式的应用界面。它集成了自然语言处理和代码生成功能，能够通过Python代码解决各种任务和问题。对于数据处理、文件操作，以及其他编程任务，您都可以通过与助手的对话轻松完成。这款助手旨在通过自然语言交流简化您的编程工作流程，提高工作效率。
 
 [功能特性](#功能特性) | [使用指南](#使用指南) | [使用配置](#使用配置) | [立即体验](#快速开始) 
 
@@ -40,9 +40,10 @@
 -  变量状态实时更新
 ### 4.演示
 - 打开网址：http://localhost:8501/#codegenie
-
+- 应用界面
 ![Streamlit](png/demo1.png)
 
+- [魔塔演示地址](https://modelscope.cn/studios/nqzxm0618/codegenie/summary)
 ## 使用配置
 ### 环境变量
 ```env
