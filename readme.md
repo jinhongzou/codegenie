@@ -69,15 +69,19 @@ authorized_imports = [
 ### 安装步骤
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/codegenie.git
+git clone https://github.com/jinhongzou/codegenie.git
 cd codegenie
 
 # 安装依赖
 pip install -r requirements.txt
 
-# 设置API密钥（可选）
-export TAVILY_API_KEY='your_tavily_key'
-export SILICONFLOW_API_KEY='your_siliconflow_key'
+# 设置TAVILY的API密钥
+export TAVILY_KEY='your_tavily_key'
+# 设置模型信息
+export MODEL_ID='your_llm_model_id'
+export API_KEY='your_llm_key'
+export BASE_URL='your_llm_url'
+
 ```
 
 ### 启动应用 
