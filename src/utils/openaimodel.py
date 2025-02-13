@@ -21,11 +21,11 @@ from typing import Dict, List, Optional
 import logging
 
 
-from smolagents.tools import Tool
-from smolagents.models import Model
-from smolagents.models import get_clean_message_list
-from smolagents.models import tool_role_conversions
-from smolagents.models import get_json_schema
+from ..smolagents.tools import Tool
+from ..smolagents.models import Model
+from ..smolagents.models import get_clean_message_list
+from ..smolagents.models import tool_role_conversions
+from ..smolagents.models import get_json_schema
 
 logger = logging.getLogger(__name__)
 

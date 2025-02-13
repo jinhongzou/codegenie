@@ -6,7 +6,7 @@ import streamlit as st
 # 导入smolagents库
 from src.smolagents.agents import CodeAgent
 from src.smolagents.tools import tool
-from src.smolagents.models import LiteLLMModel
+#rom src.smolagents.models import LiteLLMModel
 from src.utils.openaimodel import OpenAIModel
 from src.smolagents.prompts import CODE_SYSTEM_PROMPT
 import src.smolagents.global_vars as global_vars
