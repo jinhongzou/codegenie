@@ -13,9 +13,9 @@ import src.smolagents.global_vars as global_vars
 
 
 model= OpenAIModel(
-    model_id='Qwen/Qwen2.5-7B-Instruct',
-    api_key='sk-ruascruyqmbeyiojufkeqkerqdczwprkbkdaalbdakihywfo',
-    base_url='https://api.siliconflow.cn/v1',
+    model_id=os.environ.get('MODEL_ID'),
+    api_key=os.environ.get('API_KEY'),
+    base_url=os.environ.get('BASE_URL'),
 )
 
 system_prompt = (

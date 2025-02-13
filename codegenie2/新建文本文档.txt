@@ -1,0 +1,20 @@
+基础介绍
+step1: 克隆项目空间
+git lfs install
+git clone http://oauth2:aFuskRF4gWJnibzs9teS@www.modelscope.cn/studios/nqzxm0618/codegenie.git
+step2: 创建第一个Streamlit app.py文件
+import streamlit as st
+# hide side menu
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
+
+st.title("Hello World!")
+step3: 提交文件
+git add app.py
+git commit -m "Add application file"
+git push
+更多使用说明请参阅ModelScope文档中心
