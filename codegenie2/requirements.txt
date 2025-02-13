@@ -1,4 +1,0 @@
-streamlit
-e2b_code_interpreter
-litellm
-tavily-python
