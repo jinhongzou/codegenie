@@ -46,10 +46,18 @@
 - [魔塔演示地址](https://modelscope.cn/studios/nqzxm0618/codegenie/summary)
 ## 使用配置
 ### 环境变量
+
 ```env
 # 在.env文件中配置
-TAVILY_API_KEY=your_api_key_here  # Tavily搜索服务
-SILICONFLOW_API_KEY=sk-xxxxxxxxxxxx  # 硅基流动模型
+
+# Tavily搜索服务，可选。
+TAVILY_KEY=xxx
+
+# 设置模型信息
+MODEL_ID=xxx # 模型的名称id
+API_KEY =xxx  # 模型的Key
+BASE_URL=xxx # 模型的访问地址
+
 ```
 
 python包导入编程环境
