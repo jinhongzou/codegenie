@@ -75,7 +75,7 @@ cd codegenie
 # 安装依赖
 pip install -r requirements.txt
 
-# 设置TAVILY的API密钥
+# 设置TAVILY的API密钥（可选）
 export TAVILY_KEY='your_tavily_key'
 # 设置模型信息
 export MODEL_ID='your_llm_model_id'

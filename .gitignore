@@ -1,2 +1,4 @@
 src/smolagents/__pycache__
 src/utils/__pycache__
+# 调试代码
+streamlit_app.py
