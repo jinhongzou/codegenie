@@ -121,30 +121,7 @@ def pull_messages_from_step(
         yield gr.ChatMessage(role="assistant", content=f"{step_footnote}")
         yield gr.ChatMessage(role="assistant", content="-----", metadata={"status": "done"})
 
-def img2html(img_path,img_nm=''):
-    import base64
-    with open(img_path, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read()).decode()
-        
-    return f'\n<img src="data:image/png;base64,{encoded_string}" alt="{img_nm}">\n'
 
-def find_imgpath(context):
-
-    import re
-    # 示例字符串
-    #context = """{"img_path":"image.png"}"""
-    
-    # 提取图片路径
-    if isinstance(context, str):
-        match = re.search(r'{"img_path":\s*"(.*?)"}', context)
-    elif isinstance(context, dict):
-        match = re.search(r'{"img_path":\s*"(.*?)"}', str(context))
-    if match:
-        path =match.group(1)
-        print(f"找到图片信息:{path}")
-        return path
-    return None
-        
 def stream_to_gradio(
     agent,
     task: str,
@@ -179,22 +156,14 @@ def stream_to_gradio(
     final_answer = handle_agent_output_types(final_answer)
 
     if isinstance(final_answer, AgentText):
-        match_img=find_imgpath(final_answer.to_string())
-        if match_img:
-            yield gr.ChatMessage(
-                role="assistant",
-                content=f"**Final answer:** 图片展示{img2html(match_img)}",
-            ) 
-        else:
-            yield gr.ChatMessage(
-                role="assistant",
-                content=f"**Final answer:**\n{final_answer.to_string()}\n",
-            ) 
-
+        yield gr.ChatMessage(
+            role="assistant",
+            content=f"**Final answer:**\n{final_answer.to_string()}\n",
+        )
     elif isinstance(final_answer, AgentImage):
         yield gr.ChatMessage(
             role="assistant",
-            content={"path": final_answer.to_string(), "mime_type": "image/png"}
+            content={"path": final_answer.to_string(), "mime_type": "image/png"},
         )
     elif isinstance(final_answer, AgentAudio):
         yield gr.ChatMessage(
@@ -221,15 +190,74 @@ class GradioUI:
             if not os.path.exists(file_upload_folder):
                 os.mkdir(file_upload_folder)
 
-    def interact_with_agent(self, prompt, messages, session_state):
+    def interact_with_agent_bak(self, prompt, messages, session_state):
         import gradio as gr
-        
+        from PIL import Image
+
         # Get the agent type from the template agent
         if "agent" not in session_state:
             session_state["agent"] = self.agent
 
         try:
-            messages.append(gr.ChatMessage(role="user", content=prompt))
+            # 用户消息
+            messages.append({"role": "user", "content": prompt})
+            yield messages
+
+            # 模拟代理的响应
+            response_content = "This is a placeholder response."
+            img_path = None
+
+            if '图片' in prompt.lower():
+                img_path = "./examples/mascot_smol.png"
+                img = Image.open(img_path)
+                response_content = ""
+
+            # 构建消息
+            if img_path:
+                # 创建一个包含图片的消息
+                image_message = {
+                    "role": "assistant",
+                    "content": "",
+                    "image": img
+                }
+                messages.append(image_message)
+            else:
+                # 创建一个普通的文本消息
+                text_message = {
+                    "role": "assistant",
+                    "content": response_content
+                }
+                messages.append(text_message)
+
+            yield messages
+
+        except Exception as e:
+            print(f"Error in interaction: {str(e)}")
+            messages.append({"role": "assistant", "content": f"Error: {str(e)}"})
+            yield messages
+
+    def interact_with_agent(self, prompt, messages, session_state):
+        import gradio as gr
+        from PIL import Image
+
+        # Get the agent type from the template agent
+        if "agent" not in session_state:
+            session_state["agent"] = self.agent
+
+        try:
+            markdown_reply = """
+            <strong>这是一个加粗的标题</strong><br>
+            <ul>
+                <li>列表项1</li>
+                <li>列表项2</li>
+                <li>列表项3</li>
+            </ul>
+            <a href="https://example.com">这是一个链接</a><br>
+            <img src="https://hf-mirror.com/datasets/huggingface/documentation-images/resolve/main/smolagents/mascot_smol.png" alt="Hugging Face Mascot">
+            """
+            #messages.append(gr.ChatMessage(role="user", content=prompt))
+            messages.append(gr.ChatMessage(role="user", content=markdown_reply))
+
             yield messages
 
             for msg in stream_to_gradio(session_state["agent"], task=prompt, reset_agent_memory=False):
@@ -283,9 +311,15 @@ class GradioUI:
             "",
             gr.Button(interactive=False),
         )
-
+    # 加载本地图片
+    def load_local_image(self, img_path = "./examples/mascot_smol.png"):
+        from PIL import Image
+        # 确保路径正确指向你的本地图片文件
+        return Image.open("./examples/mascot_smol.png")
+    
     def launch(self, share: bool = True, **kwargs):
         import gradio as gr
+        from PIL import Image
 
         with gr.Blocks(theme="ocean", fill_height=True) as demo:
             # Add session state to store session-specific data
@@ -296,19 +330,20 @@ class GradioUI:
             with gr.Sidebar():
                 gr.Markdown(
                     f"# {self.name.replace('_', ' ').capitalize()}"
-                    "\n> This web ui allows you to interact with a `smolagents` agent that can use tools and execute steps to complete tasks."
-                    + (f"\n\n**Agent description:**\n{self.description}" if self.description else "")
+                    #"\n> This web ui allows you to interact with a `smolagents` agent that can use tools and execute steps to complete tasks."
+                    #+ (f"\n\n**Agent description:**\n{self.description}" if self.description else "")
+                    + (f"\n\n**{self.description}**" if self.description else "")
                 )
 
                 with gr.Group():
-                    gr.Markdown("**Your request**", container=True)
+                    gr.Markdown("**您的问题**", container=True)
                     text_input = gr.Textbox(
                         lines=3,
                         label="Chat Message",
                         container=False,
-                        placeholder="Enter your prompt here and press Shift+Enter or press the button",
+                        placeholder="在这里输入你的提示，然后按下 Shift+Enter 或点击按钮",
                     )
-                    submit_btn = gr.Button("Submit", variant="primary")
+                    submit_btn = gr.Button("提交", variant="primary")
 
                 # If an upload folder is provided, enable the upload feature
                 if self.file_upload_folder is not None:
@@ -323,8 +358,8 @@ class GradioUI:
                 gr.HTML("<br><br><h4><center>Powered by:</center></h4>")
                 with gr.Row():
                     gr.HTML("""<div style="display: flex; align-items: center; gap: 8px; font-family: system-ui, -apple-system, sans-serif;">
-            <img src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/smolagents/mascot_smol.png" style="width: 32px; height: 32px; object-fit: contain;" alt="logo">
-            <a target="_blank" href="https://github.com/huggingface/smolagents"><b>huggingface/smolagents</b></a>
+            <img src="https://hf-mirror.com/datasets/huggingface/documentation-images/resolve/main/smolagents/mascot_smol.png" style="width: 32px; height: 32px; object-fit: contain;" alt="logo">
+            <a target="_blank" href="https://    .com/huggingface/smolagents"><b>huggingface/smolagents</b></a>
             </div>""")
 
             # Main chat interface
@@ -333,7 +368,7 @@ class GradioUI:
                 type="messages",
                 avatar_images=(
                     None,
-                    "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/smolagents/mascot_smol.png",
+                    "https://hf-mirror.com//datasets/huggingface/documentation-images/resolve/main/smolagents/mascot_smol.png",
                 ),
                 resizeable=True,
                 scale=1,
