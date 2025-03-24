@@ -6,14 +6,14 @@ import pandas as pd
 import streamlit as st
 
 # 导入smolagents库
-from src.smolagents  import CodeAgent,tool,LiteLLMModel
+from src.smolagents  import CodeAgent,tool,LiteLLMModel,TaskStep
 from src.tools_utils  import list_files,read_file,write_file,delete_file
 from src.tools_utils  import SearchAgent
 
-#os.environ['API_KEY'] = 'sk-XXX'
-##os.environ['BASE_URL'] = 'https://api.siliconflow.cn/v1/'
-##os.environ['MODEL_ID'] = 'openai/Qwen/Qwen2.5-7B-Instruct'
-##os.environ['MODEL_CODE_ID'] = 'openai/Qwen/Qwen2.5-Coder-7B-Instruct'
+#os.environ['API_KEY'] = 'sk-xxx'
+#os.environ['BASE_URL'] = 'https://api.siliconflow.cn/v1/'
+#os.environ['MODEL_ID'] = 'openai/Qwen/Qwen2.5-7B-Instruct'
+#os.environ['MODEL_CODE_ID'] = 'openai/Qwen/Qwen2.5-Coder-7B-Instruct'
 
 #-----------------------------------------
 st.session_state.ai="🤖"
@@ -134,9 +134,9 @@ def display_value_list(agent):
         truncated_value = str(var_value)[:max_length] + ("..." if len(str(var_value)) > max_length else "")
         st.sidebar.write(f"{var_name}: {truncated_value}")
 
-def save_uploaded_file( work_dir):
+def save_uploaded_file(agent, work_dir):
     """保存上传的文件到指定目录"""
-		# 文件上传组件
+	# 文件上传组件
     uploaded_file = st.sidebar.file_uploader("", type=None)
 
     if uploaded_file is not None:
@@ -147,14 +147,19 @@ def save_uploaded_file( work_dir):
         with open(file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
 
+        #  告知agent用户文件已上传
+        from datetime import datetime
+        task=f"请忽略以下内容，无需回应：\n用户上传了一个文件，文件名为{uploaded_file.name}，大小为{uploaded_file.size} 字节，上传时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}。"
+        agent.memory.steps.append(TaskStep(task=task))
+
         # 显示上传文件的信息
         st.write(f"已上传文件：{uploaded_file.name}, 文件大小： {uploaded_file.size} 字节")
 
 
-def display_file_list(directory='.'):
+def display_file_list(agent, directory='.'):
     """在侧边栏中显示文件列表"""
 
-    save_uploaded_file( work_dir=directory)
+    save_uploaded_file(agent, work_dir=directory)
 
     st.sidebar.subheader("tmp目录")
     try:
@@ -238,13 +243,18 @@ def chat():
             messages.append({"role": "user", "content": f"执行代码: \n```{prompt}```"})
             messages.append({"role": "assistant", "content": f"执行结果: \n```{response}```"})
 
+            #  告知agent用户执行代码
+            from datetime import datetime
+            task=f"请忽略以下内容，无需回应：\n- 用户执行了一段代码：```python {prompt} ```，\n- 执行结果: \n```{response}```。- 执行时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}。"
+            agent.memory.steps.append(TaskStep(task=task))
+
 
     st.session_state.mode = st.radio("选择模式", ("聊天", "执行代码"), horizontal=True)
     st.button("清空对话", on_click=clear_chat_history)
 
 
     # 在侧边栏中显示文件列表
-    display_file_list(directory='tmp')
+    display_file_list(agent, directory='tmp')
 
     # 更新并显示变量列表
     display_value_list(agent)
