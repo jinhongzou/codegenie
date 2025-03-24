@@ -56,7 +56,7 @@ a=1+9
 - 应用界面
 
 <video width="640" height="360" controls>
-  <source src="png/demo.mp4" type="video/mp4">
+  <source src="https://www.toutiao.com/video/7485300506361872932/?from_scene=all&log_from=671563184e37d_1742810149971" type="video/mp4">
 </video>
 
 **共享文件**
