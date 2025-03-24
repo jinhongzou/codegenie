@@ -55,6 +55,10 @@ a=1+9
 - 打开网址：http://localhost:8501/#codegenie
 - 应用界面
 
+<video width="640" height="360" controls>
+  <source src="png/demo.mp4" type="video/mp4">
+</video>
+
 **共享文件**
 ![Streamlit](png/demo1.png)
 
