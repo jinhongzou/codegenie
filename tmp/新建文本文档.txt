@@ -1,0 +1,19 @@
+import re
+
+# 假设这是你的final_answer转换成的字符串
+final_answer_str = "请查看此链接下的图片：https://example.com/path/to/image.png 和其他信息"
+
+# 使用改进后的正则表达式寻找图片链接
+img_url_pattern = re.compile(r'https?:\/\/[^\s]+\.(jpg|jpeg|png|gif)(\?[^\s]*)?')
+matches = img_url_pattern.findall(final_answer_str)
+
+if matches:
+    print("找到的图片路径:")
+    # 注意：findall() 方法返回的是元组列表，每个元组包含匹配的各个分组
+    # 我们需要重构这些结果来展示完整的URL
+    for match in matches:
+        full_match = re.search(r'https?:\/\/[^\s]+\.(jpg|jpeg|png|gif)(\?[^\s]*)?', final_answer_str)
+        if full_match:
+            print(full_match.group(0))
+else:
+    print("未找到图片路径")
